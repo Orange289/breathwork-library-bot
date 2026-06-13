@@ -3,14 +3,16 @@ import path from "node:path";
 export const botToken = process.env.TELEGRAM_BOT_TOKEN;
 export const adminSecret = process.env.ADMIN_SECRET;
 
+const defaultDataDir = process.env.NETLIFY
+  ? "/tmp"
+  : path.join(/* turbopackIgnore: true */ process.cwd(), "data");
+
 export const excelLogPath = path.resolve(
-  /* turbopackIgnore: true */ process.cwd(),
-  process.env.EXCEL_LOG_PATH ?? "./data/breathwork-actions.xlsx"
+  process.env.EXCEL_LOG_PATH ?? path.join(defaultDataDir, "breathwork-actions.xlsx")
 );
 
 export const subscriptionsPath = path.resolve(
-  /* turbopackIgnore: true */ process.cwd(),
-  process.env.SUBSCRIPTIONS_PATH ?? "./data/subscriptions.json"
+  process.env.SUBSCRIPTIONS_PATH ?? path.join(defaultDataDir, "subscriptions.json")
 );
 
 export const audioPaths = {

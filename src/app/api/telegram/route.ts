@@ -47,7 +47,7 @@ async function handleMessage(update: TelegramUpdate) {
   }
 
   if (message.text === "/start") {
-    appendExcelLog({ user, action: "command", label: "/start" });
+    safeAppendExcelLog({ user, action: "command", label: "/start" });
     await sendMessage(message.chat.id, welcomeText, welcomeKeyboard());
     return;
   }
@@ -70,7 +70,7 @@ async function handleCallback(update: TelegramUpdate) {
   const user = callback.from;
   const data = callback.data;
 
-  appendExcelLog({
+  safeAppendExcelLog({
     user,
     action: "button",
     label: data
@@ -145,4 +145,12 @@ async function sendPracticesMenu(chatId: number) {
     "Выберите практику:",
     practicesKeyboard()
   );
+}
+
+function safeAppendExcelLog(entry: Parameters<typeof appendExcelLog>[0]) {
+  try {
+    appendExcelLog(entry);
+  } catch (error) {
+    console.error("Excel log failed", error);
+  }
 }

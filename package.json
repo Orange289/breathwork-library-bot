@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "set-webhook": "tsx scripts/set-webhook.ts"
+    "set-webhook": "node scripts/set-webhook.mjs"
   },
   "dependencies": {
     "next": "latest",
