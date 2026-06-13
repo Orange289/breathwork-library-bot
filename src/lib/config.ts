@@ -24,6 +24,15 @@ export const audioPaths = {
   subscriptionPractice3: process.env.AUDIO_SUBSCRIPTION_PRACTICE_3_PATH
 };
 
+export const audioFileIds = {
+  balance: process.env.AUDIO_BALANCE_FILE_ID,
+  energy: process.env.AUDIO_ENERGY_FILE_ID,
+  relaxation: process.env.AUDIO_RELAXATION_FILE_ID,
+  subscriptionPractice1: process.env.AUDIO_SUBSCRIPTION_PRACTICE_1_FILE_ID,
+  subscriptionPractice2: process.env.AUDIO_SUBSCRIPTION_PRACTICE_2_FILE_ID,
+  subscriptionPractice3: process.env.AUDIO_SUBSCRIPTION_PRACTICE_3_FILE_ID
+};
+
 export function requireBotToken() {
   if (!botToken) {
     throw new Error("TELEGRAM_BOT_TOKEN is not configured");

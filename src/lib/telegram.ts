@@ -30,25 +30,35 @@ export async function answerCallbackQuery(callbackQueryId: string, text?: string
 
 export async function sendAudio(
   chatId: number,
-  audioPath: string,
+  audio: string,
   caption?: string,
   replyMarkup?: ReplyMarkup
 ) {
-  if (!fs.existsSync(audioPath)) {
+  if (!isLocalFilePath(audio)) {
+    return telegramRequest("sendAudio", {
+      chat_id: chatId,
+      audio,
+      caption,
+      reply_markup: replyMarkup,
+      protect_content: true
+    });
+  }
+
+  if (!fs.existsSync(audio)) {
     await sendMessage(
       chatId,
-      `Аудиофайл пока не найден: ${audioPath}`,
+      `Аудиофайл пока не найден: ${audio}`,
       replyMarkup
     );
     return;
   }
 
   const formData = new FormData();
-  const bytes = fs.readFileSync(audioPath);
+  const bytes = fs.readFileSync(audio);
   const file = new Blob([new Uint8Array(bytes)], { type: "audio/mpeg" });
 
   formData.append("chat_id", String(chatId));
-  formData.append("audio", file, path.basename(audioPath));
+  formData.append("audio", file, path.basename(audio));
   formData.append("protect_content", "true");
 
   if (caption) {
@@ -67,6 +77,10 @@ export async function sendAudio(
   if (!response.ok) {
     throw new Error(`Telegram sendAudio failed: ${await response.text()}`);
   }
+}
+
+function isLocalFilePath(audio: string) {
+  return audio.startsWith("/") || audio.startsWith("./") || audio.startsWith("../");
 }
 
 async function telegramRequest(method: string, payload: Record<string, unknown>) {

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { audioPaths } from "@/lib/config";
+import { audioFileIds, audioPaths } from "@/lib/config";
 import { appendExcelLog } from "@/lib/excel-log";
 import {
   backToMenuKeyboard,
@@ -49,6 +49,12 @@ async function handleMessage(update: TelegramUpdate) {
   if (message.text === "/start") {
     safeAppendExcelLog({ user, action: "command", label: "/start" });
     await sendMessage(message.chat.id, welcomeText, welcomeKeyboard());
+    return;
+  }
+
+  if (message.text === "/id") {
+    safeAppendExcelLog({ user, action: "command", label: "/id" });
+    await sendMessage(message.chat.id, `Ваш Telegram ID: ${user.id}`);
     return;
   }
 
@@ -116,9 +122,9 @@ async function handlePractice(chatId: number, user: TelegramUser, practiceId: st
     return;
   }
 
-  const audioPath = audioPaths[practice.audioKey];
+  const audio = audioFileIds[practice.audioKey] ?? audioPaths[practice.audioKey];
 
-  if (!audioPath) {
+  if (!audio) {
     if (practice.placeholder) {
       await sendMessage(
         chatId,
@@ -136,7 +142,7 @@ async function handlePractice(chatId: number, user: TelegramUser, practiceId: st
     return;
   }
 
-  await sendAudio(chatId, audioPath, practice.title, backToMenuKeyboard());
+  await sendAudio(chatId, audio, practice.title, backToMenuKeyboard());
 }
 
 async function sendPracticesMenu(chatId: number) {
