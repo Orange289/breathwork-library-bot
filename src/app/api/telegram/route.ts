@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { audioFileIds, audioPaths } from "@/lib/config";
 import { appendExcelLog } from "@/lib/excel-log";
+import { appendGoogleSheetLog } from "@/lib/google-sheets-log";
 import {
   backToMenuKeyboard,
   practicesKeyboard,
@@ -10,6 +11,7 @@ import {
 import { findPractice, subscribeText, welcomeText } from "@/lib/practices";
 import { hasActiveSubscription, markPaymentPending } from "@/lib/subscriptions";
 import { answerCallbackQuery, sendAudio, sendMessage } from "@/lib/telegram";
+import type { LogEntry } from "@/lib/log-entry";
 import type { TelegramUpdate, TelegramUser } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -47,13 +49,13 @@ async function handleMessage(update: TelegramUpdate) {
   }
 
   if (message.text === "/start") {
-    safeAppendExcelLog({ user, action: "command", label: "/start" });
+    await safeAppendLog({ user, action: "command", label: "/start" });
     await sendMessage(message.chat.id, welcomeText, welcomeKeyboard());
     return;
   }
 
   if (message.text === "/id") {
-    safeAppendExcelLog({ user, action: "command", label: "/id" });
+    await safeAppendLog({ user, action: "command", label: "/id" });
     await sendMessage(message.chat.id, `Ваш Telegram ID: ${user.id}`);
     return;
   }
@@ -76,25 +78,22 @@ async function handleCallback(update: TelegramUpdate) {
   const user = callback.from;
   const data = callback.data;
 
-  safeAppendExcelLog({
-    user,
-    action: "button",
-    label: data
-  });
-
   await answerCallbackQuery(callback.id);
 
   if (data === "start") {
+    await safeAppendLog({ user, action: "button", label: data });
     await sendMessage(chatId, welcomeText, welcomeKeyboard());
     return;
   }
 
   if (data === "menu") {
+    await safeAppendLog({ user, action: "button", label: data });
     await sendPracticesMenu(chatId);
     return;
   }
 
   if (data === "paid") {
+    await safeAppendLog({ user, action: "button", label: data });
     markPaymentPending(user);
     await sendMessage(
       chatId,
@@ -113,11 +112,33 @@ async function handlePractice(chatId: number, user: TelegramUser, practiceId: st
   const practice = findPractice(practiceId);
 
   if (!practice) {
+    await safeAppendLog({
+      user,
+      action: "button",
+      label: `practice:${practiceId}`,
+      subscriptionStatus: "unknown"
+    });
     await sendMessage(chatId, "Практика не найдена.", practicesKeyboard());
     return;
   }
 
-  if (practice.type === "subscription" && !hasActiveSubscription(user.id)) {
+  const activeSubscription = hasActiveSubscription(user.id);
+  const subscriptionStatus =
+    practice.type === "free"
+      ? "free"
+      : activeSubscription
+        ? "subscription_active"
+        : "subscription_required";
+
+  await safeAppendLog({
+    user,
+    action: "button",
+    label: `practice:${practice.id}`,
+    practice: practice.title,
+    subscriptionStatus
+  });
+
+  if (practice.type === "subscription" && !activeSubscription) {
     await sendMessage(chatId, subscribeText, subscriptionKeyboard());
     return;
   }
@@ -153,10 +174,16 @@ async function sendPracticesMenu(chatId: number) {
   );
 }
 
-function safeAppendExcelLog(entry: Parameters<typeof appendExcelLog>[0]) {
+async function safeAppendLog(entry: LogEntry) {
   try {
     appendExcelLog(entry);
   } catch (error) {
     console.error("Excel log failed", error);
+  }
+
+  try {
+    await appendGoogleSheetLog(entry);
+  } catch (error) {
+    console.error("Google Sheets log failed", error);
   }
 }

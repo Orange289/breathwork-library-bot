@@ -2,6 +2,10 @@ import path from "node:path";
 
 export const botToken = process.env.TELEGRAM_BOT_TOKEN;
 export const adminSecret = process.env.ADMIN_SECRET;
+export const googleSheetsSpreadsheetId = process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
+export const googleSheetsSheetName = process.env.GOOGLE_SHEETS_SHEET_NAME ?? "actions";
+export const googleServiceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+export const googlePrivateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
 
 const defaultDataDir = process.env.NETLIFY
   ? "/tmp"

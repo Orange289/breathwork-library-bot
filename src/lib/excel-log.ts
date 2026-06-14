@@ -2,13 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import * as XLSX from "xlsx";
 import { excelLogPath } from "./config";
-import type { TelegramUser } from "./types";
-
-type LogEntry = {
-  user: TelegramUser;
-  action: string;
-  label: string;
-};
+import { logEntryToRow, type LogEntry } from "./log-entry";
 
 const headers = [
   "Дата/время",
@@ -17,7 +11,9 @@ const headers = [
   "Имя",
   "Фамилия",
   "Действие",
-  "Кнопка"
+  "Кнопка",
+  "Практика",
+  "Статус подписки"
 ];
 
 export function appendExcelLog(entry: LogEntry) {
@@ -31,15 +27,7 @@ export function appendExcelLog(entry: LogEntry) {
   const sheet = workbook.Sheets[sheetName];
   const rows: unknown[][] = sheet ? XLSX.utils.sheet_to_json(sheet, { header: 1 }) : [headers];
 
-  rows.push([
-    new Date().toLocaleString("ru-RU", { timeZone: "Europe/Lisbon" }),
-    entry.user.id,
-    entry.user.username ? `@${entry.user.username}` : "",
-    entry.user.first_name ?? "",
-    entry.user.last_name ?? "",
-    entry.action,
-    entry.label
-  ]);
+  rows.push(logEntryToRow(entry));
 
   workbook.Sheets[sheetName] = XLSX.utils.aoa_to_sheet(rows);
 
