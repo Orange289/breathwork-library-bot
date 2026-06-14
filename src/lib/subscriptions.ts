@@ -55,11 +55,18 @@ export function writeStore(store: Store) {
 
 export function markPaymentPending(user: TelegramUser) {
   const store = readStore();
-  store.pendingPayments[userKey(user.id)] = {
+  const key = userKey(user.id);
+
+  if (store.pendingPayments[key]) {
+    return false;
+  }
+
+  store.pendingPayments[key] = {
     user: toStoredUser(user),
     requestedAt: new Date().toISOString()
   };
   writeStore(store);
+  return true;
 }
 
 export function hasActiveSubscription(userId: number) {

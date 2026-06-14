@@ -93,8 +93,17 @@ async function handleCallback(update: TelegramUpdate) {
   }
 
   if (data === "paid") {
-    await safeAppendLog({ user, action: "button", label: data });
-    markPaymentPending(user);
+    const createdPendingPayment = markPaymentPending(user);
+
+    if (createdPendingPayment) {
+      await safeAppendLog({
+        user,
+        action: "button",
+        label: data,
+        subscriptionStatus: "payment_pending"
+      });
+    }
+
     await sendMessage(
       chatId,
       "Я проверю оплату и скоро открою вам доступ к практикам!",
