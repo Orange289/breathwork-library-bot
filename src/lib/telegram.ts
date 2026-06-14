@@ -38,6 +38,7 @@ export async function sendAudio(
     return telegramRequest("sendAudio", {
       chat_id: chatId,
       audio,
+      title: caption,
       caption,
       reply_markup: replyMarkup,
       protect_content: true
@@ -63,6 +64,7 @@ export async function sendAudio(
 
   if (caption) {
     formData.append("caption", caption);
+    formData.append("title", caption);
   }
 
   if (replyMarkup) {

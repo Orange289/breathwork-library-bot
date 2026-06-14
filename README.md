@@ -70,8 +70,8 @@ and sends the practices menu again.
 The three free files are configured through env variables:
 
 ```bash
-AUDIO_BALANCE_PATH=/Users/orange/Desktop/BREATHWORK/СЕССИИ/короткие/баланс/breathwork-баланс-2.mp3
-AUDIO_ENERGY_PATH=/Users/orange/Desktop/BREATHWORK/СЕССИИ/живой breathwork/энергия/breathwork-soft-energy-anya.mp3
+AUDIO_BALANCE_PATH=/Users/orange/Desktop/BREATHWORK/СЕССИИ/короткие/баланс/баланс.mp3
+AUDIO_ENERGY_PATH=/Users/orange/Desktop/BREATHWORK/СЕССИИ/живой breathwork/энергия/мягкая-энергия.mp3
 AUDIO_RELAXATION_PATH=/Users/orange/Desktop/BREATHWORK/СЕССИИ/живой breathwork/расслабление/расслабление.mp3
 AUDIO_SUBSCRIPTION_PRACTICE_1_PATH=
 AUDIO_SUBSCRIPTION_PRACTICE_2_PATH=

@@ -89,6 +89,7 @@ async function uploadAudio(audioPath, title) {
 
   formData.append("chat_id", chatId);
   formData.append("audio", file, path.basename(audioPath));
+  formData.append("title", title);
   formData.append("caption", title);
   formData.append("protect_content", "true");
 
