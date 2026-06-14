@@ -9,7 +9,6 @@ const headers = [
   "Telegram ID",
   "Username",
   "Имя",
-  "Фамилия",
   "Действие",
   "Кнопка",
   "Практика",

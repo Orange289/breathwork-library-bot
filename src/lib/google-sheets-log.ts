@@ -30,7 +30,7 @@ export async function appendGoogleSheetLog(entry: LogEntry) {
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: googleSheetsSpreadsheetId,
-    range: `${googleSheetsSheetName}!A:I`,
+    range: `${googleSheetsSheetName}!A:H`,
     valueInputOption: "USER_ENTERED",
     insertDataOption: "INSERT_ROWS",
     requestBody: {

@@ -75,7 +75,7 @@ and sends the practices menu again.
 Create a Google Sheet with a sheet/tab named `actions`, then add these headers in row 1:
 
 ```text
-Дата/время | Telegram ID | Username | Имя | Фамилия | Действие | Кнопка | Практика | Статус подписки
+Дата/время | Telegram ID | Username | Имя | Действие | Кнопка | Практика | Статус подписки
 ```
 
 Share the Google Sheet with the service account email from `GOOGLE_SERVICE_ACCOUNT_EMAIL` and give it `Editor` access.

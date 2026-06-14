@@ -14,7 +14,6 @@ export function logEntryToRow(entry: LogEntry) {
     entry.user.id,
     entry.user.username ? `@${entry.user.username}` : "",
     entry.user.first_name ?? "",
-    entry.user.last_name ?? "",
     entry.action,
     entry.label,
     entry.practice ?? "",
