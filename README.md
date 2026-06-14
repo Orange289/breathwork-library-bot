@@ -63,6 +63,14 @@ When a user presses `Оплатил/оплатила`, they appear in the pendin
 
 and sends the practices menu again.
 
+You can also approve a payment from the terminal after checking the transfer:
+
+```bash
+npm run approve-subscription -- TELEGRAM_USER_ID
+```
+
+Find `TELEGRAM_USER_ID` in the Google Sheets `Telegram ID` column.
+
 ## Files
 
 - Excel log: `data/breathwork-actions.xlsx`

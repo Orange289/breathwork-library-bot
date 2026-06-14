@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "set-webhook": "node scripts/set-webhook.mjs",
-    "upload-audio": "node scripts/upload-audio.mjs"
+    "upload-audio": "node scripts/upload-audio.mjs",
+    "approve-subscription": "node scripts/approve-subscription.mjs"
   },
   "dependencies": {
     "google-auth-library": "^10.7.0",

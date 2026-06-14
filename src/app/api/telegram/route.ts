@@ -106,7 +106,7 @@ async function handleCallback(update: TelegramUpdate) {
 
     await sendMessage(
       chatId,
-      "Я проверю оплату и скоро открою вам доступ к практикам!",
+      "Спасибо! Я проверю оплату и, как только она поступит, открою вам доступ к практикам по подписке.",
       backToMenuKeyboard()
     );
     return;
