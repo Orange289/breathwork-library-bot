@@ -78,7 +78,7 @@ async function handleCallback(update: TelegramUpdate) {
   const user = callback.from;
   const data = callback.data;
 
-  await answerCallbackQuery(callback.id);
+  await safeAnswerCallbackQuery(callback.id);
 
   if (data === "start") {
     await safeAppendLog({ user, action: "button", label: data });
@@ -194,5 +194,13 @@ async function safeAppendLog(entry: LogEntry) {
     await appendGoogleSheetLog(entry);
   } catch (error) {
     console.error("Google Sheets log failed", error);
+  }
+}
+
+async function safeAnswerCallbackQuery(callbackQueryId: string) {
+  try {
+    await answerCallbackQuery(callbackQueryId);
+  } catch (error) {
+    console.error("Answer callback query failed", error);
   }
 }
