@@ -37,19 +37,19 @@ export const subscribeText = `Подписка на практики стоит 
 export const practices: Practice[] = [
   {
     id: "balance",
-    title: "Баланс",
+    title: "Баланс (бесплатно)",
     type: "free",
     audioKey: "balance",
   },
   {
     id: "energy",
-    title: "Энергия",
+    title: "Энергия (бесплатно)",
     type: "free",
     audioKey: "energy",
   },
   {
     id: "relaxation",
-    title: "Расслабление",
+    title: "Расслабление (бесплатно)",
     type: "free",
     audioKey: "relaxation",
   },
