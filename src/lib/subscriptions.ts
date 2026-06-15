@@ -27,6 +27,8 @@ type Store = {
   subscriptions: Record<string, Subscription>;
 };
 
+const emptyStore = (): Store => ({ pendingPayments: {}, subscriptions: {} });
+
 export function userKey(userId: number) {
   return String(userId);
 }
@@ -42,10 +44,26 @@ export function toStoredUser(user: TelegramUser): StoredUser {
 
 export function readStore(): Store {
   if (!fs.existsSync(subscriptionsPath)) {
-    return { pendingPayments: {}, subscriptions: {} };
+    return emptyStore();
   }
 
-  return JSON.parse(fs.readFileSync(subscriptionsPath, "utf8")) as Store;
+  try {
+    const rawStore = fs.readFileSync(subscriptionsPath, "utf8").trim();
+
+    if (!rawStore) {
+      return emptyStore();
+    }
+
+    const parsedStore = JSON.parse(rawStore) as Partial<Store>;
+
+    return {
+      pendingPayments: parsedStore.pendingPayments ?? {},
+      subscriptions: parsedStore.subscriptions ?? {}
+    };
+  } catch (error) {
+    console.error("Subscription store read failed", error);
+    return emptyStore();
+  }
 }
 
 export function writeStore(store: Store) {

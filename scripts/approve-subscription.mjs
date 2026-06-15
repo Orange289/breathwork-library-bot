@@ -31,10 +31,13 @@ async function main() {
     }
   );
 
-  const result = await response.json();
+  const responseText = await response.text();
+  const result = parseJson(responseText);
 
-  if (!response.ok || !result.ok) {
-    throw new Error(`Approval failed: ${JSON.stringify(result)}`);
+  if (!response.ok || !result?.ok) {
+    throw new Error(
+      `Approval failed: HTTP ${response.status} ${response.statusText}. Response: ${responseText || "<empty>"}`
+    );
   }
 
   console.log("Subscription approved:");
@@ -45,3 +48,15 @@ main().catch((error) => {
   console.error(error);
   process.exit(1);
 });
+
+function parseJson(text) {
+  if (!text) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
