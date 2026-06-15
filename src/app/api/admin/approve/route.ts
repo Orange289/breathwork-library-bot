@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     let subscription;
 
     try {
-      subscription = approveSubscription(body.userId);
+      subscription = await approveSubscription(body.userId);
     } catch (error) {
       return NextResponse.json(
         {

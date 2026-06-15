@@ -12,6 +12,7 @@
     "approve-subscription": "node scripts/approve-subscription.mjs"
   },
   "dependencies": {
+    "@netlify/blobs": "^10.7.9",
     "google-auth-library": "^10.7.0",
     "googleapis": "^173.0.0",
     "next": "latest",

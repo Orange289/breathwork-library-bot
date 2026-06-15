@@ -100,7 +100,7 @@ async function handleCallback(update: TelegramUpdate) {
       subscriptionStatus: "payment_pending"
     });
 
-    safeMarkPaymentPending(user);
+    await safeMarkPaymentPending(user);
 
     await sendMessage(
       chatId,
@@ -129,7 +129,7 @@ async function handlePractice(chatId: number, user: TelegramUser, practiceId: st
     return;
   }
 
-  const activeSubscription = hasActiveSubscription(user.id);
+  const activeSubscription = await hasActiveSubscription(user.id);
   const subscriptionStatus =
     practice.type === "free"
       ? "free"
@@ -203,9 +203,9 @@ async function safeAnswerCallbackQuery(callbackQueryId: string) {
   }
 }
 
-function safeMarkPaymentPending(user: TelegramUser) {
+async function safeMarkPaymentPending(user: TelegramUser) {
   try {
-    markPaymentPending(user);
+    await markPaymentPending(user);
   } catch (error) {
     console.error("Mark payment pending failed", error);
   }

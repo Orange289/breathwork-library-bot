@@ -22,7 +22,7 @@ export default async function AdminPage({
     );
   }
 
-  const store = readStore();
+  const store = await readStore();
   const pendingPayments = Object.values(store.pendingPayments);
   const subscriptions = Object.values(store.subscriptions);
 

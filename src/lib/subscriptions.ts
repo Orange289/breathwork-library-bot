@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { getStore } from "@netlify/blobs";
 import { subscriptionsPath } from "./config";
 import { addOneMonth } from "./practices";
 import type { TelegramUser } from "./types";
@@ -27,6 +28,9 @@ type Store = {
   subscriptions: Record<string, Subscription>;
 };
 
+const STORE_NAME = "subscriptions";
+const STORE_KEY = "store";
+
 const emptyStore = (): Store => ({ pendingPayments: {}, subscriptions: {} });
 
 export function userKey(userId: number) {
@@ -42,13 +46,46 @@ export function toStoredUser(user: TelegramUser): StoredUser {
   };
 }
 
-export function readStore(): Store {
-  if (!fs.existsSync(subscriptionsPath)) {
-    return emptyStore();
+// Returns the Netlify Blobs store when the runtime is configured for it
+// (i.e. on the deployed site). Falls back to `null` for local development,
+// where there is no Blobs context and we use the filesystem instead.
+function blobStore() {
+  try {
+    return getStore(STORE_NAME);
+  } catch {
+    return null;
+  }
+}
+
+async function readRaw(): Promise<string | null> {
+  const store = blobStore();
+
+  if (store) {
+    return (await store.get(STORE_KEY, { type: "text" })) ?? null;
   }
 
+  if (!fs.existsSync(subscriptionsPath)) {
+    return null;
+  }
+
+  return fs.readFileSync(subscriptionsPath, "utf8");
+}
+
+async function writeRaw(raw: string): Promise<void> {
+  const store = blobStore();
+
+  if (store) {
+    await store.set(STORE_KEY, raw);
+    return;
+  }
+
+  fs.mkdirSync(path.dirname(subscriptionsPath), { recursive: true });
+  fs.writeFileSync(subscriptionsPath, raw);
+}
+
+export async function readStore(): Promise<Store> {
   try {
-    const rawStore = fs.readFileSync(subscriptionsPath, "utf8").trim();
+    const rawStore = (await readRaw())?.trim();
 
     if (!rawStore) {
       return emptyStore();
@@ -66,13 +103,12 @@ export function readStore(): Store {
   }
 }
 
-export function writeStore(store: Store) {
-  fs.mkdirSync(path.dirname(subscriptionsPath), { recursive: true });
-  fs.writeFileSync(subscriptionsPath, `${JSON.stringify(store, null, 2)}\n`);
+export async function writeStore(store: Store): Promise<void> {
+  await writeRaw(`${JSON.stringify(store, null, 2)}\n`);
 }
 
-export function markPaymentPending(user: TelegramUser) {
-  const store = readStore();
+export async function markPaymentPending(user: TelegramUser) {
+  const store = await readStore();
   const key = userKey(user.id);
 
   if (store.pendingPayments[key]) {
@@ -83,12 +119,12 @@ export function markPaymentPending(user: TelegramUser) {
     user: toStoredUser(user),
     requestedAt: new Date().toISOString()
   };
-  writeStore(store);
+  await writeStore(store);
   return true;
 }
 
-export function hasActiveSubscription(userId: number) {
-  const store = readStore();
+export async function hasActiveSubscription(userId: number) {
+  const store = await readStore();
   const subscription = store.subscriptions[userKey(userId)];
 
   if (!subscription) {
@@ -98,8 +134,8 @@ export function hasActiveSubscription(userId: number) {
   return new Date(subscription.activeUntil).getTime() >= Date.now();
 }
 
-export function approveSubscription(userId: number) {
-  const store = readStore();
+export async function approveSubscription(userId: number) {
+  const store = await readStore();
   const key = userKey(userId);
   const pending = store.pendingPayments[key];
   const previousUser = store.subscriptions[key]?.user;
@@ -112,7 +148,7 @@ export function approveSubscription(userId: number) {
   };
 
   delete store.pendingPayments[key];
-  writeStore(store);
+  await writeStore(store);
 
   return store.subscriptions[key];
 }
