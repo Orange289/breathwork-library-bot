@@ -93,16 +93,14 @@ async function handleCallback(update: TelegramUpdate) {
   }
 
   if (data === "paid") {
-    const createdPendingPayment = markPaymentPending(user);
+    await safeAppendLog({
+      user,
+      action: "button",
+      label: data,
+      subscriptionStatus: "payment_pending"
+    });
 
-    if (createdPendingPayment) {
-      await safeAppendLog({
-        user,
-        action: "button",
-        label: data,
-        subscriptionStatus: "payment_pending"
-      });
-    }
+    safeMarkPaymentPending(user);
 
     await sendMessage(
       chatId,
@@ -202,5 +200,13 @@ async function safeAnswerCallbackQuery(callbackQueryId: string) {
     await answerCallbackQuery(callbackQueryId);
   } catch (error) {
     console.error("Answer callback query failed", error);
+  }
+}
+
+function safeMarkPaymentPending(user: TelegramUser) {
+  try {
+    markPaymentPending(user);
+  } catch (error) {
+    console.error("Mark payment pending failed", error);
   }
 }

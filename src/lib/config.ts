@@ -17,15 +17,27 @@ const defaultDataDir = process.env.NETLIFY
   ? "/tmp"
   : path.join(/* turbopackIgnore: true */ process.cwd(), "data")
 
-export const excelLogPath = path.resolve(
-  process.env.EXCEL_LOG_PATH ??
-    path.join(defaultDataDir, "breathwork-actions.xlsx"),
+export const excelLogPath = resolveWritablePath(
+  process.env.EXCEL_LOG_PATH,
+  "breathwork-actions.xlsx",
 )
 
-export const subscriptionsPath = path.resolve(
-  process.env.SUBSCRIPTIONS_PATH ??
-    path.join(defaultDataDir, "subscriptions.json"),
+export const subscriptionsPath = resolveWritablePath(
+  process.env.SUBSCRIPTIONS_PATH,
+  "subscriptions.json",
 )
+
+function resolveWritablePath(value: string | undefined, fallbackFileName: string) {
+  if (!value) {
+    return path.join(defaultDataDir, fallbackFileName)
+  }
+
+  if (process.env.NETLIFY && !path.isAbsolute(value)) {
+    return path.join(defaultDataDir, path.basename(value))
+  }
+
+  return path.resolve(value)
+}
 
 export const audioPaths = {
   balance: process.env.AUDIO_BALANCE_PATH,
